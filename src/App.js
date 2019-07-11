@@ -127,7 +127,7 @@ class DrawArea extends Component {
           </div>
           <div className="sidebar">
             <h5 className="h5-title"> Objects</h5>
-            {this.state.shapes.map((s, index) => (<div className="obj" key={index}  ><Button className="btn-radius btn-no-border" variant="secondary" id={'poly' + index} onLoad={this.toggle} onClick={this.toggle}><FontAwesomeIcon icon={faEye} /></Button><Badge className=" badge-size" variant="secondary"  > Object - {index + 1}</Badge> </div>))}
+            {this.state.shapes.map((s, index) => (<div className="obj" key={index}  ><Button className="btn-radius btn-no-border" variant="secondary" id={'poly' + index} onClick={this.toggle}><FontAwesomeIcon icon={faEye} /></Button><Badge className=" badge-size" variant="secondary"  > Object - {index + 1}</Badge> </div>))}
           </div>
         </div>
 
@@ -144,37 +144,20 @@ function Drawing({ point, draw, shapes }) {
   let style = {
     display: "block"
   }
-  if (shapes.length !== 0) {
 
-    return (
+  return (
+    <svg className="drawing">
+      {point.map((p, index) => (
+        <circle key={index} cx={p.x} cy={p.y} r="4" stroke="green" strokeWidth="2" fill="yellow" />
+      ))}
+      {shapes.map((s, index) => (
+        <Draggable key={index}>
+          <rect style={style} className={className1} x={s[0].x} y={s[0].y} width={s[0].w} height={s[0].h} key={index} name={'poly' + index} strokeDasharray="10,10" fill="blue" stroke="black" fillOpacity="0.1"><title>Object {index + 1} </title></rect>
+        </Draggable>
+      ))}
+    </svg>
+  );
 
-      <svg className="drawing">
-
-        {point.map((p, index) => (
-          <circle key={index} cx={p.x} cy={p.y} r="4" stroke="green" strokeWidth="2" fill="yellow" />
-        ))}
-        {shapes.map((s, index) => (
-          <Draggable key={index}>
-            <rect style={style} className={className1} x={s[0].x} y={s[0].y} width={s[0].w} height={s[0].h} key={index} name={'poly' + index} strokeDasharray="10,10" fill="blue" stroke="black" fillOpacity="0.1"><title>Object {index + 1} </title></rect>
-          </Draggable>
-
-        ))}
-
-      </svg>
-
-
-    );
-
-  } else {
-    return (
-      <svg className="drawing">
-
-        {point.map((p, index) => (
-          <circle key={index} cx={p.x} cy={p.y} r="4" stroke="green" strokeWidth="2" fill="yellow" />
-        ))}
-      </svg>
-    );
-  }
 }
 
 
