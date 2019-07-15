@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import './App.css';
-import Draggable from 'react-draggable';
-import { Button, Badge } from 'react-bootstrap';
-import { faArrowsAlt, faObjectUngroup, faEye } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { library,dom } from '@fortawesome/fontawesome-svg-core';
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { library, dom } from '@fortawesome/fontawesome-svg-core';
+
+import Drawing from './Components/Drawing';
+import ToolBar from './Components/ToolBar';
+import SideBar from './Components/SideBar';
+import Header from './Components/Header';
+
 
 library.add(faEyeSlash, faEye)
 dom.watch()
 
-
-class DrawArea extends Component {
+export default class DrawArea extends Component {
   constructor(props) {
     super(props);
 
@@ -26,23 +28,24 @@ class DrawArea extends Component {
     this.drag = this.drag.bind(this);
     this.toggle = this.toggle.bind(this);
   }
+
   draw() {
     this.setState({ isDrawing: true });
 
   }
+
   drag() {
     this.setState({ isDrawing: false });
 
   }
+
   toggle(e) {
     let str = e.currentTarget.id
-
 
     if (document.getElementsByName(str)[0].style.display === "block") {
       document.getElementsByName(str)[0].style.display = "none"
       document.getElementById(str).innerHTML = '<i class="fas fa-eye-slash"></i>'
-    }
-    else {
+    } else {
       document.getElementsByName(str)[0].style.display = "block"
       document.getElementById(str).innerHTML = '<i class="fas fa-eye"></i>'
     }
@@ -71,19 +74,18 @@ class DrawArea extends Component {
 
   }
 
-
   handleMouseUp(e) {
 
     if (this.state.points.length >= 4 && this.state.points.length % 4 === 0 && this.state.isDrawing === true) {
       let x = [];
       let y = [];
-
       let sx, sy, lx, ly, width, height;
 
       this.state.points.map((p) => (
         x.push(p.x),
         y.push(p.y)
       ))
+
       sx = Math.min(...x);
       sy = Math.min(...y);
       lx = Math.max(...x);
@@ -106,59 +108,20 @@ class DrawArea extends Component {
     if (this.state.isDrawing === true) {
       className += " cursor"
     }
+    dom.watch()
     return (
       <div>
-        <div className="header">
-          <h3 className="title">Test App</h3>
-        </div>
+
+        <Header></Header>
         <div className="flex">
-          <div className="tool-div">
-            <h5 className="h5-title">Tools</h5>
-            <Button className="tool" variant="outline-light" onClick={this.drag} title="Drag"><FontAwesomeIcon icon={faArrowsAlt} /></Button>
-            <Button variant="outline-light" onClick={this.draw} title="Select"><FontAwesomeIcon icon={faObjectUngroup} /></Button>
+          <ToolBar draw={this.draw} drag={this.drag}></ToolBar>
+          <div className={className} ref="drawArea" onMouseDown={this.handleMouseDown} onMouseUp={this.handleMouseUp} >
+            <Drawing point={this.state.points} draw={this.state.isDrawing} shapes={this.state.shapes} />
           </div>
-          <div
-            className={className}
-            ref="drawArea"
-            onMouseDown={this.handleMouseDown}
-            onMouseUp={this.handleMouseUp}
-          >
-            <Drawing point={this.state.points} draw={this.state.isDrawing} rectangles={this.state.rectangles} shapes={this.state.shapes} />
-          </div>
-          <div className="sidebar">
-            <h5 className="h5-title"> Objects</h5>
-            {this.state.shapes.map((s, index) => (<div className="obj" key={index}  ><Button className="btn-radius btn-no-border" variant="secondary" id={'poly' + index} onClick={this.toggle}><FontAwesomeIcon icon={faEye} /></Button><Badge className=" badge-size" variant="secondary"  > Object - {index + 1}</Badge> </div>))}
-          </div>
+          <SideBar toggle={this.toggle} shapes={this.state.shapes}></SideBar>
         </div>
 
       </div>
     );
   }
 }
-
-function Drawing({ point, draw, shapes }) {
-  let className1 = "draggable";
-  if (draw === true) {
-    className1 = "static";
-  }
-  let style = {
-    display: "block"
-  }
-
-  return (
-    <svg className="drawing">
-      {point.map((p, index) => (
-        <circle key={index} cx={p.x} cy={p.y} r="4" stroke="green" strokeWidth="2" fill="yellow" />
-      ))}
-      {shapes.map((s, index) => (
-        <Draggable key={index}>
-          <rect style={style} className={className1} x={s[0].x} y={s[0].y} width={s[0].w} height={s[0].h} key={index} name={'poly' + index} strokeDasharray="10,10" fill="blue" stroke="black" fillOpacity="0.1"><title>Object {index + 1} </title></rect>
-        </Draggable>
-      ))}
-    </svg>
-  );
-
-}
-
-
-export default DrawArea;
